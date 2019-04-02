@@ -440,6 +440,20 @@ MiAqaraPlatform.prototype.parseMessage = function(msg, rinfo) {
         that.log.debug("[Revc]" + msg);
         var gatewaySid = jsonObj['sid'];
         if(that.ConfigUtil.isConfigGateway(gatewaySid)) {
+            var gateway = that.GatewayUtil.getBySid(gatewaySid);
+            if(!gateway) {
+                // add gateway
+                gateway = {
+                    sid: gatewaySid,
+                    passwd: that.ConfigUtil.getGatewayPasswordByGatewaySid(gatewaySid),
+                    ip: jsonObj['ip'], // rinfo.address,
+                    port: jsonObj['port'], // rinfo.port,
+                    proto_version: jsonObj['proto_version'],
+                    model: jsonObj['model']
+                }
+                gateway = that.GatewayUtil.addOrUpdate(gatewaySid, gateway);
+            }
+
             if(that.ConfigUtil.isHostGateway(gatewaySid) && cmd != 'virtual_iam') {
                 return;
             }
